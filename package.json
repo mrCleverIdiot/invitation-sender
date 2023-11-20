@@ -1,0 +1,36 @@
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "setup": "node index.js",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.3.4",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.3.8",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0",
+    "mongoose": "^7.0.3",
+    "mysql2": "^3.2.4",
+    "node-fetch": "^3.3.1",
+    "openai": "^3.2.1",
+    "pm2": "^5.3.0",
+    "qrcode-terminal": "^0.12.0",
+    "tsx": "^3.12.6",
+    "whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7",
+    "wwebjs-mongo": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.5",
+    "typescript": "^5.0.2"
+  }
+}
