@@ -1,15 +1,14 @@
-import express from 'express';
+
 import qrcode from 'qrcode-terminal';
 import pkg from 'whatsapp-web.js';
-
-import mysql from "mysql2/promise";
-const { Client, MessageMedia } = pkg;
-import cors from 'cors';
-import { resolve, join } from 'path';
-
-
+import { resolve } from 'path';
 import csv from "csv-parser";
 import fs from "fs";
+
+const { Client, MessageMedia } = pkg;
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 const client = new Client({
     puppeteer: {
@@ -40,7 +39,7 @@ client.on("ready", () => {
                 // const message = "Hello,\nThis is a test message with a line break.";
 
                 setTimeout(() => {
-                    const resolvedAttachmentPath = resolve("/Users/vikii/Downloads/test.pdf");
+                    const resolvedAttachmentPath = resolve(process.env.ATTACHEMENT_PATH);
 
                     const media = MessageMedia.fromFilePath(resolvedAttachmentPath);
 
