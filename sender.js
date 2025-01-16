@@ -14,8 +14,8 @@ const client = new Client({
     puppeteer: {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
     },
+    webCache: false, // Disable web cache
 });
-
 client.on("qr", (qr) => {
     qrcode.generate(qr, { small: true });
 });
@@ -39,11 +39,11 @@ client.on("ready", () => {
                 // const message = "Hello,\nThis is a test message with a line break.";
 
                 setTimeout(() => {
-                    const resolvedAttachmentPath = resolve(process.env.ATTACHEMENT_PATH);
+                    // const resolvedAttachmentPath = resolve(process.env.ATTACHEMENT_PATH);
 
-                    const media = MessageMedia.fromFilePath(resolvedAttachmentPath);
+                    // const media = MessageMedia.fromFilePath(resolvedAttachmentPath);
 
-                    client.sendMessage(phoneNumber, media, { caption: ' ' });
+                    client.sendMessage(phoneNumber, message);
                     console.log(`Processing number ${index + 1} of ${phoneNumbers.length}: ${phoneNumber}`);
                     console.log(`Sent message to ${phoneNumber}`);
                     console.log("-------------------------------");
