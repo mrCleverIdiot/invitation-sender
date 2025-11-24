@@ -37,21 +37,27 @@ client.on("change_state", (state) => {
     console.log(`State changed to: ${state}`);
 });
 
+// ============================================
+// CUSTOM MESSAGE - Edit this message as needed
+// ============================================
+const CUSTOM_MESSAGE = `નમસ્કાર 🙏
+અમારા પરિવારમાં લગ્નનો આ પવિત્ર પ્રસંગ આવ્યો છે,
+તમારા સ્નેહ અને આશીર્વાદ વગર આ દિવસ અધૂરો છે.
+કૃપા કરીને સમય કાઢી આવી અમારી ખુશીમાં જોડાશો,
+આપની ઉપસ્થિતિ અમારે માટે વિશેષ અને અમૂલ્ય છે 💐`;
+
 client.on("ready", () => {
     console.log("✅✅✅ Client is ready! Starting to send messages...");
     const phoneNumbers = [];
-    const messages = [];
 
-    // Read phone numbers and messages from CSV file
+    // Read phone numbers from CSV file
     fs.createReadStream("messages.csv")
         .pipe(csv())
         .on("data", (data) => {
-            const phoneNumber = data.phoneNumber.trim();
-            const message = data.message.trim();
-            if (phoneNumber && message) {
-                phoneNumbers.push("91" + phoneNumber + "@c.us");
-                messages.push(message);
-                console.log(`Loaded: ${phoneNumber} -> ${message.substring(0, 30)}...`);
+            const phoneNumber = data.phoneNumber?.trim();
+            if (phoneNumber) {
+                phoneNumbers.push("91" + phoneNumber + "@c.us");                
+                console.log(`Loaded: ${phoneNumber}`);
             }
         })
         .on("error", (error) => {
@@ -65,17 +71,17 @@ client.on("ready", () => {
                 return;
             }
             
+            console.log(`📝 Message to send: "${CUSTOM_MESSAGE}"`);
+            
             // Send messages to each phone number with delay of 2 seconds between each message
-            phoneNumbers.forEach((phoneNumber, index) => {
-                const message = messages[index];
+            phoneNumbers.forEach((phoneNumber, index) => {                
                 
                 setTimeout(async () => {
                     try {
-                        console.log(`Processing number ${index + 1} of ${phoneNumbers.length}: ${phoneNumber}`);
-                        console.log(`Message: ${message}`);
+                        console.log(`Processing number ${index + 1} of ${phoneNumbers.length}: ${phoneNumber}`);                        
                         
                         // Send text message
-                        const result = await client.sendMessage(phoneNumber, message);
+                        const result = await client.sendMessage(phoneNumber, CUSTOM_MESSAGE);
                         console.log(`✅ Successfully sent message to ${phoneNumber}`);
                         
                         // Optionally send attachment if ATTACHEMENT_PATH is set
