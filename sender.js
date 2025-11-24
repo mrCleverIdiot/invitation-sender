@@ -73,12 +73,16 @@ client.on("ready", () => {
             
             console.log(`📝 Message to send: "${CUSTOM_MESSAGE}"`);
             
-            // Send messages to each phone number with delay of 2 seconds between each message
-            phoneNumbers.forEach((phoneNumber, index) => {                
+            // Send messages to each phone number with random delay above 5 seconds but not more than 40 seconds
+            let cumulativeDelay = 0;
+            phoneNumbers.forEach((phoneNumber, index) => {
+                // Generate random delay between 5000ms (5 sec) and 40000ms (40 sec)
+                const randomDelay = Math.floor(Math.random() * (40000 - 5000 + 1)) + 5000;
+                cumulativeDelay += randomDelay;
                 
                 setTimeout(async () => {
                     try {
-                        console.log(`Processing number ${index + 1} of ${phoneNumbers.length}: ${phoneNumber}`);                        
+                        console.log(`Processing number ${index + 1} of ${phoneNumbers.length}: ${phoneNumber} (delay: ${randomDelay}ms)`);                        
                         
                         // Send text message
                         const result = await client.sendMessage(phoneNumber, CUSTOM_MESSAGE);
@@ -101,7 +105,7 @@ client.on("ready", () => {
                         console.error(`❌ Failed to send message to ${phoneNumber}:`, error.message);
                         console.log("-------------------------------");
                     }
-                }, (index + 1) * 2000); // delay in milliseconds
+                }, cumulativeDelay); // random delay below 5 seconds per message
             });
         });
 });
