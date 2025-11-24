@@ -54,7 +54,8 @@ client.on("ready", () => {
     fs.createReadStream("messages.csv")
         .pipe(csv())
         .on("data", (data) => {
-            const phoneNumber = data.phoneNumber?.trim();
+            // Remove all whitespaces from phone number (including spaces, tabs, etc.)
+            const phoneNumber = data.phoneNumber?.trim().replace(/\s+/g, '');
             if (phoneNumber) {
                 phoneNumbers.push("91" + phoneNumber + "@c.us");                
                 console.log(`Loaded: ${phoneNumber}`);
