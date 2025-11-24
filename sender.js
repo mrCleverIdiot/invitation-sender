@@ -46,19 +46,64 @@ const CUSTOM_MESSAGE = `નમસ્કાર 🙏
 કૃપા કરીને સમય કાઢી આવી અમારી ખુશીમાં જોડાશો,
 આપની ઉપસ્થિતિ અમારે માટે વિશેષ અને અમૂલ્ય છે 💐`;
 
+// Helper function to normalize phone number
+function normalizePhoneNumber(phoneNumber) {
+    // Remove all whitespaces
+    let cleaned = phoneNumber.trim().replace(/\s+/g, '');
+    
+    // If length > 10, check if it starts with +91 or 91
+    if (cleaned.length > 10) {
+        if (cleaned.startsWith('+91')) {
+            // Remove +91 prefix and take last 10 digits
+            cleaned = cleaned.substring(3);
+        } else if (cleaned.startsWith('91')) {
+            // Remove 91 prefix and take last 10 digits
+            cleaned = cleaned.substring(2);
+        }
+        // Take last 10 digits in case of any other format
+        if (cleaned.length > 10) {
+            cleaned = cleaned.slice(-10);
+        }
+    }
+    
+    return cleaned;
+}
+
+// Helper function to log failed phone numbers
+function logFailedNumber(phoneNumber) {
+    const logFile = 'failed_numbers.log';
+    const timestamp = new Date().toISOString();
+    const logEntry = `${phoneNumber}\n`;
+    
+    try {
+        fs.appendFileSync(logFile, logEntry, 'utf8');
+        console.log(`📝 Failed number logged to ${logFile}`);
+    } catch (error) {
+        console.error(`❌ Failed to write to log file:`, error.message);
+    }
+}
+
 client.on("ready", () => {
     console.log("✅✅✅ Client is ready! Starting to send messages...");
     const phoneNumbers = [];
+    const originalNumbers = []; // Store original numbers for logging
 
     // Read phone numbers from CSV file
     fs.createReadStream("messages.csv")
         .pipe(csv())
         .on("data", (data) => {
-            // Remove all whitespaces from phone number (including spaces, tabs, etc.)
-            const phoneNumber = data.phoneNumber?.trim().replace(/\s+/g, '');
-            if (phoneNumber) {
-                phoneNumbers.push("91" + phoneNumber + "@c.us");                
-                console.log(`Loaded: ${phoneNumber}`);
+            const rawPhoneNumber = data.phoneNumber?.trim();
+            if (rawPhoneNumber) {
+                // Normalize phone number (remove whitespaces and handle +91/91 prefix)
+                const normalizedNumber = normalizePhoneNumber(rawPhoneNumber);
+                
+                if (normalizedNumber.length === 10) {
+                    phoneNumbers.push("91" + normalizedNumber + "@c.us");
+                    originalNumbers.push(rawPhoneNumber); // Keep original for logging
+                    console.log(`Loaded: ${rawPhoneNumber} → ${normalizedNumber}`);
+                } else {
+                    console.warn(`⚠️  Skipped invalid phone number: ${rawPhoneNumber} (normalized: ${normalizedNumber}, length: ${normalizedNumber.length})`);
+                }
             }
         })
         .on("error", (error) => {
@@ -80,6 +125,7 @@ client.on("ready", () => {
                 // Generate random delay between 5000ms (5 sec) and 40000ms (40 sec)
                 const randomDelay = Math.floor(Math.random() * (40000 - 5000 + 1)) + 5000;
                 cumulativeDelay += randomDelay;
+                const originalNumber = originalNumbers[index]; // Get original number for logging
                 
                 setTimeout(async () => {
                     try {
@@ -104,9 +150,11 @@ client.on("ready", () => {
                         console.log("-------------------------------");
                     } catch (error) {
                         console.error(`❌ Failed to send message to ${phoneNumber}:`, error.message);
+                        // Log failed number to file
+                        logFailedNumber(originalNumber);
                         console.log("-------------------------------");
                     }
-                }, cumulativeDelay); // random delay below 5 seconds per message
+                }, cumulativeDelay); // random delay above 5 seconds but not more than 40 seconds per message
             });
         });
 });
